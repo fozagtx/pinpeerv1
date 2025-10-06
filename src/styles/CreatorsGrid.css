@@ -1,0 +1,137 @@
+.creators-container {
+    padding: 8rem 2rem 2rem 2rem;
+    margin: 0;
+}
+
+.creators-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.creators-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+}
+
+.creators-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.creators-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.creators-grid > * {
+    flex: 0 1 calc(25% - 1.125rem);
+    min-width: 250px;
+}
+
+.empty-peers {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-peers p {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-peers-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 1200px) {
+    .creators-grid > * {
+        flex: 0 1 calc(33.333% - 1rem);
+    }
+}
+
+@media (max-width: 900px) {
+    .creators-grid > * {
+        flex: 0 1 calc(50% - 0.75rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .creators-container {
+        padding: 6rem 1rem 2rem 1rem;
+    }
+
+    .creators-title {
+        font-size: 2rem;
+    }
+
+    .creators-subtitle {
+        font-size: 1rem;
+    }
+
+    .creators-grid {
+        gap: 1rem;
+    }
+
+    .creators-grid > * {
+        flex: 0 1 calc(50% - 0.5rem);
+        min-width: 0;
+    }
+
+    .empty-peers {
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-peers p {
+        font-size: 1.1rem;
+    }
+
+    .empty-peers-subtitle {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .creators-container {
+        padding: 5rem 0.75rem 1.5rem 0.75rem;
+    }
+
+    .creators-header {
+        margin-bottom: 1rem;
+    }
+
+    .creators-title {
+        font-size: 1.5rem;
+    }
+
+    .creators-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .creators-grid {
+        gap: 0.75rem;
+    }
+
+    .creators-grid > * {
+        flex: 0 1 100%;
+    }
+
+    .empty-peers {
+        padding: 2rem 1rem;
+    }
+
+    .empty-peers p {
+        font-size: 1rem;
+    }
+
+    .empty-peers-subtitle {
+        font-size: 0.85rem;
+    }
+}

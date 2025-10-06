@@ -1,0 +1,322 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease-in-out;
+    padding: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: #1d1d1d;
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(250, 204, 21, 0.2);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.success-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.success-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #facc15;
+    margin: 0 0 0.5rem 0;
+}
+
+.success-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.receipt-container {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+}
+
+.receipt-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.receipt-value {
+    font-size: 0.875rem;
+    color: white;
+    font-weight: 600;
+}
+
+.receipt-txid {
+    font-family: monospace;
+    font-size: 0.75rem;
+    background-color: rgba(250, 204, 21, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: #facc15;
+    word-break: break-all;
+}
+
+.status-row {
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 1rem 0.75rem;
+    border-radius: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-direction: column;
+}
+
+.explorer-button {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: rgba(250, 204, 21, 0.1);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.explorer-button:hover {
+    background-color: rgba(250, 204, 21, 0.2);
+    border-color: rgba(250, 204, 21, 0.5);
+}
+
+.close-modal-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #facc15;
+    color: black;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.close-modal-button:hover {
+    background-color: #eab308;
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1999;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -50px;
+    font-size: 2rem;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 0.75rem;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+        border-radius: 1.25rem;
+    }
+
+    .success-icon {
+        font-size: 3rem;
+    }
+
+    .success-title {
+        font-size: 1.5rem;
+    }
+
+    .success-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .receipt-container {
+        padding: 1.25rem;
+    }
+
+    .receipt-label,
+    .receipt-value {
+        font-size: 0.8rem;
+    }
+
+    .receipt-txid {
+        font-size: 0.7rem;
+    }
+
+    .explorer-button,
+    .close-modal-button {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 0.5rem;
+    }
+
+    .modal-content {
+        padding: 1.25rem;
+        border-radius: 1rem;
+    }
+
+    .success-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .success-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .success-title {
+        font-size: 1.25rem;
+    }
+
+    .success-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .receipt-container {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .receipt-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        padding: 0.5rem 0;
+    }
+
+    .receipt-label {
+        font-size: 0.75rem;
+    }
+
+    .receipt-value {
+        font-size: 0.8rem;
+    }
+
+    .receipt-txid {
+        font-size: 0.65rem;
+        width: 100%;
+    }
+
+    .status-row {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .status-badge {
+        font-size: 0.8rem;
+    }
+
+    .modal-actions {
+        gap: 0.5rem;
+    }
+
+    .explorer-button {
+        padding: 0.625rem;
+        font-size: 0.85rem;
+    }
+
+    .close-modal-button {
+        padding: 0.875rem;
+        font-size: 0.9rem;
+    }
+}

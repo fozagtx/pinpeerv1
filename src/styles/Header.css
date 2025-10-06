@@ -1,0 +1,216 @@
+.header-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem;
+    background-color: transparent;
+}
+
+.header-wrapper {
+    background-color: #1d1d1d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: white;
+    display: block;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.tab-button:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-button.active {
+    background-color: #facc15;
+    color: black;
+}
+
+.balance-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+}
+
+.balance-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.balance-amount {
+    font-size: 0.875rem;
+    color: #facc15;
+    font-weight: 600;
+    font-family: monospace;
+}
+
+.connect-wallet-button,
+.disconnect-wallet-button {
+    font-size: 0.875rem;
+    background-color: #facc15;
+    color: black;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    transition: background-color 0.2s;
+}
+
+.connect-wallet-button:hover,
+.disconnect-wallet-button:hover {
+    background-color: #eab308;
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 0.75rem;
+    }
+
+    .header-wrapper {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        height: auto;
+        min-height: 3.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .logo-text {
+        font-size: 1.1rem;
+    }
+
+    .header-nav {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .header-tabs {
+        gap: 0.25rem;
+        padding: 0.2rem;
+    }
+
+    .tab-button {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .balance-display {
+        padding: 0.375rem 0.75rem;
+    }
+
+    .balance-label {
+        display: none;
+    }
+
+    .balance-amount {
+        font-size: 0.75rem;
+    }
+
+    .connect-wallet-button,
+    .disconnect-wallet-button {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0.5rem;
+    }
+
+    .header-wrapper {
+        padding: 0.5rem;
+        border-radius: 0.75rem;
+    }
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .header-tabs {
+        width: 100%;
+        order: 3;
+        justify-content: space-between;
+    }
+
+    .tab-button {
+        flex: 1;
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .balance-display {
+        padding: 0.3rem 0.6rem;
+    }
+
+    .balance-amount {
+        font-size: 0.7rem;
+    }
+
+    .connect-wallet-button,
+    .disconnect-wallet-button {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        white-space: nowrap;
+    }
+}
