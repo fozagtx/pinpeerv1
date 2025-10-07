@@ -7,6 +7,8 @@ export function Header({
   onConnectionChange,
   currentView,
   onViewChange,
+  showTurnkeyWallet,
+  onToggleTurnkeyWallet,
 }) {
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,13 +35,11 @@ export function Header({
         setBalance(null);
       }
     };
-
     getUserData();
   }, [connected]);
 
   const fetchBalance = async (address) => {
     if (!address) return;
-
     setLoading(true);
     try {
       const response = await fetch(
@@ -97,9 +97,8 @@ export function Header({
             <span className="logo-text">pinpeer</span>
           </div>
         </div>
-
         <nav className="header-nav">
-          {connected && (
+          {!showTurnkeyWallet && connected && (
             <div className="header-tabs">
               <button
                 className={`tab-button ${currentView === "creators" ? "active" : ""}`}
@@ -121,7 +120,13 @@ export function Header({
               </button>
             </div>
           )}
-          {connected && balance !== null && (
+          <button
+            className={`tab-button ${showTurnkeyWallet ? "active" : ""}`}
+            onClick={onToggleTurnkeyWallet}
+          >
+            Embedded Wallet
+          </button>
+          {connected && balance !== null && !showTurnkeyWallet && (
             <div className="balance-display">
               <span className="balance-label">Balance:</span>
               <span className="balance-amount">

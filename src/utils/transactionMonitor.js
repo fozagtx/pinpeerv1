@@ -2,9 +2,6 @@ const HIRO_API_BASE =
   import.meta.env.VITE_HIRO_API_BASE_URL || "https://api.testnet.hiro.so";
 const HIRO_API_KEY = import.meta.env.VITE_HIRO_API_KEY;
 
-/**
- * Get headers with optional API key
- */
 function getHeaders() {
   const headers = {
     Accept: "application/json",
@@ -40,7 +37,6 @@ export async function monitorTransaction(
 
       if (!response.ok) {
         if (response.status === 404) {
-          // Transaction not yet in mempool
           onUpdate({
             status: "pending",
             message: "Transaction submitted to mempool...",
@@ -52,8 +48,6 @@ export async function monitorTransaction(
       }
 
       const data = await response.json();
-
-      // Check transaction status
       if (data.tx_status === "success") {
         onUpdate({
           status: "confirmed",

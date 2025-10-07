@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { isConnected, openSTXTransfer } from "@stacks/connect";
 import { STACKS_TESTNET } from "@stacks/network";
+import { openSTXTransfer, isConnected } from "@stacks/connect";
 import { Header } from "./components/Header";
 import { CreatorsGrid } from "./components/CreatorsGrid";
 import { LandingPage } from "./components/LandingPage";
 import { SuccessModal } from "./components/SuccessModal";
 import { TransactionHistory } from "./components/TransactionHistory";
+import { TurnkeyWalletManager } from "./components/TurnkeyWalletManager";
 import { creatorsData } from "./mockData";
 import "./styles/App.css";
 
@@ -15,6 +16,7 @@ function App() {
   const [transactionData, setTransactionData] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentView, setCurrentView] = useState("creators");
+  const [showTurnkeyWallet, setShowTurnkeyWallet] = useState(false);
   const [pinnedPeers, setPinnedPeers] = useState(() => {
     const saved = localStorage.getItem("pinnedPeers");
     return saved ? JSON.parse(saved) : [];
@@ -123,9 +125,12 @@ function App() {
         onConnectionChange={handleConnectionChange}
         currentView={currentView}
         onViewChange={handleViewChange}
+        showTurnkeyWallet={showTurnkeyWallet}
+        onToggleTurnkeyWallet={() => setShowTurnkeyWallet(!showTurnkeyWallet)}
       />
-
-      {!connected ? (
+      {showTurnkeyWallet ? (
+        <TurnkeyWalletManager />
+      ) : !connected ? (
         <LandingPage
           onConnect={() => {
             document.querySelector(".connect-wallet-button")?.click();
@@ -153,7 +158,6 @@ function App() {
       ) : (
         <TransactionHistory transactions={transactionHistory} />
       )}
-
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
