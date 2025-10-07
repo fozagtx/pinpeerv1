@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { connect, disconnect, isConnected } from "@stacks/connect";
+import { DarkModeToggle } from "./DarkModeToggle";
 import "../styles/Header.css";
 
 export function Header({
@@ -9,6 +10,7 @@ export function Header({
   onViewChange,
   showTurnkeyWallet,
   onToggleTurnkeyWallet,
+  onDarkModeChange,
 }) {
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -134,6 +136,7 @@ export function Header({
               </span>
             </div>
           )}
+          <DarkModeToggle onToggle={onDarkModeChange} />
           {!connected ? (
             <button
               className="connect-wallet-button"

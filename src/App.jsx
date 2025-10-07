@@ -1,22 +1,26 @@
 import { useState, useEffect } from "react";
-import { STACKS_TESTNET } from "@stacks/network";
-import { openSTXTransfer, isConnected } from "@stacks/connect";
+import { isConnected } from "@stacks/connect";
+import { useTurnkey, AuthState } from "@turnkey/react-wallet-kit";
 import { Header } from "./components/Header";
 import { CreatorsGrid } from "./components/CreatorsGrid";
 import { LandingPage } from "./components/LandingPage";
 import { SuccessModal } from "./components/SuccessModal";
 import { TransactionHistory } from "./components/TransactionHistory";
 import { TurnkeyWalletManager } from "./components/TurnkeyWalletManager";
+import { DonationModal } from "./components/DonationModal";
 import { creatorsData } from "./mockData";
 import "./styles/App.css";
 
-function App() {
+function App({ onDarkModeChange }) {
+  const { authState } = useTurnkey();
   const [connected, setConnected] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [transactionData, setTransactionData] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentView, setCurrentView] = useState("creators");
   const [showTurnkeyWallet, setShowTurnkeyWallet] = useState(false);
+  const [showDonationModal, setShowDonationModal] = useState(false);
+  const [donationParams, setDonationParams] = useState(null);
   const [pinnedPeers, setPinnedPeers] = useState(() => {
     const saved = localStorage.getItem("pinnedPeers");
     return saved ? JSON.parse(saved) : [];
@@ -27,20 +31,28 @@ function App() {
   });
 
   useEffect(() => {
-    setConnected(isConnected());
-  }, []);
+    // Check if EITHER Stacks Connect OR Turnkey is connected
+    const stacksConnected = isConnected();
+    const turnkeyConnected = authState === AuthState.Authenticated;
+    const anyWalletConnected = stacksConnected || turnkeyConnected;
+
+    setConnected(anyWalletConnected);
+  }, [authState]);
 
   useEffect(() => {
     const checkConnection = () => {
-      const connectionStatus = isConnected();
-      if (connectionStatus !== connected) {
-        setConnected(connectionStatus);
+      const stacksConnected = isConnected();
+      const turnkeyConnected = authState === AuthState.Authenticated;
+      const anyWalletConnected = stacksConnected || turnkeyConnected;
+
+      if (anyWalletConnected !== connected) {
+        setConnected(anyWalletConnected);
       }
     };
 
     const intervalId = setInterval(checkConnection, 500);
     return () => clearInterval(intervalId);
-  }, [connected]);
+  }, [connected, authState]);
 
   useEffect(() => {
     localStorage.setItem("pinnedPeers", JSON.stringify(pinnedPeers));
@@ -68,54 +80,64 @@ function App() {
     setSelectedCard({ creatorId, amount });
   };
 
-  const handleDonate = async (
-    recipientAddress,
-    amount,
-    creatorName,
-    creatorId,
-  ) => {
-    try {
-      await openSTXTransfer({
-        recipient: recipientAddress,
-        amount: (amount * 1000000).toString(),
-        memo: `Pinning ${creatorName} on PinPeer`,
-        network: STACKS_TESTNET,
-        onFinish: (data) => {
-          console.log("Transaction submitted:", data.txId);
-          const txData = {
-            txId: data.txId,
-            amount: amount,
-            creatorName: creatorName,
-            recipient: recipientAddress,
-            timestamp: new Date().toISOString(),
-          };
-          setTransactionData(txData);
+  const handleDonate = (recipientAddress, amount, creatorName, creatorId) => {
+    console.log("🎯 handleDonate called:", {
+      recipientAddress,
+      amount,
+      creatorName,
+      creatorId,
+    });
 
-          // Add to transaction history
-          setTransactionHistory((prev) => [txData, ...prev]);
+    // Open donation modal with UnifiedDonation component
+    setDonationParams({
+      recipientAddress,
+      amount,
+      creatorName,
+      creatorId,
+    });
+    setShowDonationModal(true);
 
-          // Add to pinned peers if not already pinned
-          const creator = creatorsData.find((c) => c.id === creatorId);
-          if (creator && !pinnedPeers.find((p) => p.id === creatorId)) {
-            setPinnedPeers((prev) => [
-              ...prev,
-              { ...creator, pinnedAt: new Date().toISOString() },
-            ]);
-          }
+    console.log("✅ Donation modal should now be visible");
+  };
 
-          setShowSuccessModal(true);
-          setSelectedCard(null);
-        },
-        onCancel: () => {
-          console.log("Transaction cancelled");
-        },
-      });
-    } catch (error) {
-      console.error("Error sending STX:", error);
-      alert(
-        "😅 Oops! Something went wrong with your donation.\n\n🔄 No worries, your funds are safe! Please try again.\n\n💬 If this keeps happening, make sure your wallet is unlocked.",
-      );
+  const handleDonationSuccess = (result) => {
+    const txData = {
+      txId: result.txId,
+      amount: result.amount,
+      creatorName: result.creatorName,
+      recipient: result.recipient,
+      timestamp: new Date().toISOString(),
+      walletType: result.walletType,
+    };
+
+    setTransactionData(txData);
+
+    // Add to transaction history
+    setTransactionHistory((prev) => [txData, ...prev]);
+
+    // Add to pinned peers if not already pinned
+    const creator = creatorsData.find(
+      (c) => c.id === donationParams?.creatorId,
+    );
+    if (
+      creator &&
+      !pinnedPeers.find((p) => p.id === donationParams?.creatorId)
+    ) {
+      setPinnedPeers((prev) => [
+        ...prev,
+        { ...creator, pinnedAt: new Date().toISOString() },
+      ]);
     }
+
+    // Close donation modal and show success modal
+    setShowDonationModal(false);
+    setShowSuccessModal(true);
+    setSelectedCard(null);
+  };
+
+  const handleDonationCancel = () => {
+    setShowDonationModal(false);
+    setDonationParams(null);
   };
 
   return (
@@ -127,6 +149,7 @@ function App() {
         onViewChange={handleViewChange}
         showTurnkeyWallet={showTurnkeyWallet}
         onToggleTurnkeyWallet={() => setShowTurnkeyWallet(!showTurnkeyWallet)}
+        onDarkModeChange={onDarkModeChange}
       />
       {showTurnkeyWallet ? (
         <TurnkeyWalletManager />
@@ -163,6 +186,15 @@ function App() {
         onClose={() => setShowSuccessModal(false)}
         transactionData={transactionData}
       />
+      {showDonationModal && donationParams && (
+        <DonationModal
+          creatorName={donationParams.creatorName}
+          recipientAddress={donationParams.recipientAddress}
+          amount={donationParams.amount}
+          onSuccess={handleDonationSuccess}
+          onCancel={handleDonationCancel}
+        />
+      )}
     </div>
   );
 }

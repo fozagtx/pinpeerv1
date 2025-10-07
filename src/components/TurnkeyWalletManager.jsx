@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTurnkey, AuthState } from "@turnkey/react-wallet-kit";
+import { SigningManager } from "./SigningManager";
+import { StacksTransactionTester } from "./StacksTransactionTester";
 import "../styles/TurnkeyWalletManager.css";
 
 export function TurnkeyWalletManager() {
+  console.log("TurnkeyWalletManager component rendering");
+
+  const turnkeyHook = useTurnkey();
+  console.log("Turnkey hook result:", turnkeyHook);
+
   const {
     authState,
     user,
@@ -13,9 +20,39 @@ export function TurnkeyWalletManager() {
     handleImportWallet,
     handleExportWallet,
     createWalletAccounts,
-  } = useTurnkey();
+    handleConnectExternalWallet,
+    fetchWalletProviders,
+    connectWalletAccount,
+    disconnectWalletAccount,
+  } = turnkeyHook;
 
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [externalProviders, setExternalProviders] = useState([]);
+  const [showExternalWallets, setShowExternalWallets] = useState(false);
+  const [showSigningManager, setShowSigningManager] = useState(false);
+  const [showStacksTester, setShowStacksTester] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("TurnkeyWalletManager - authState:", authState);
+    console.log("TurnkeyWalletManager - user:", user);
+    console.log("TurnkeyWalletManager - wallets:", wallets);
+  }, [authState, user, wallets]);
+
+  // Fetch available external wallet providers
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        const providers = await fetchWalletProviders();
+        setExternalProviders(providers);
+      } catch (error) {
+        console.error("Error fetching wallet providers:", error);
+      }
+    };
+    if (authState === AuthState.Authenticated) {
+      loadProviders();
+    }
+  }, [authState, fetchWalletProviders]);
 
   const handleCreateWallet = async () => {
     setIsCreatingWallet(true);
@@ -48,12 +85,52 @@ export function TurnkeyWalletManager() {
     }
   };
 
+  const handleConnectExternal = async (provider) => {
+    try {
+      await connectWalletAccount(provider);
+      await refreshWallets();
+      console.log("External wallet connected:", provider);
+    } catch (error) {
+      console.error("Error connecting external wallet:", error);
+      alert("Failed to connect external wallet. Please try again.");
+    }
+  };
+
+  const handleDisconnectExternal = async (provider) => {
+    try {
+      await disconnectWalletAccount(provider);
+      await refreshWallets();
+      console.log("External wallet disconnected:", provider);
+    } catch (error) {
+      console.error("Error disconnecting external wallet:", error);
+      alert("Failed to disconnect external wallet. Please try again.");
+    }
+  };
+
+  // Show loading state while authentication is in progress
+  if (authState === AuthState.Authenticating) {
+    return (
+      <div className="turnkey-container">
+        <div className="turnkey-card">
+          <h2>Turnkey Embedded Wallet</h2>
+          <p>Authenticating...</p>
+          <div className="loading-spinner">⏳</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
   if (authState !== AuthState.Authenticated) {
     return (
       <div className="turnkey-container">
         <div className="turnkey-card">
           <h2>Turnkey Embedded Wallet</h2>
           <p>Sign in to manage your embedded wallets</p>
+          <p className="auth-instructions">
+            Click below to create an account or log in using email, passkey, or
+            social login.
+          </p>
           <button onClick={handleLogin} className="turnkey-button primary">
             Login / Sign Up
           </button>
@@ -81,14 +158,103 @@ export function TurnkeyWalletManager() {
           <button onClick={handleImportWallet} className="turnkey-button">
             Import Wallet
           </button>
+          <button
+            onClick={handleConnectExternalWallet}
+            className="turnkey-button primary"
+          >
+            Connect External Wallet
+          </button>
+          <button
+            onClick={() => setShowExternalWallets(!showExternalWallets)}
+            className="turnkey-button"
+          >
+            {showExternalWallets ? "Hide" : "Show"} External Wallets
+          </button>
           <button onClick={refreshWallets} className="turnkey-button">
             Refresh Wallets
           </button>
+          <button
+            onClick={() => setShowSigningManager(!showSigningManager)}
+            className="turnkey-button"
+          >
+            {showSigningManager ? "Hide" : "Show"} Signing Interface
+          </button>
+          <button
+            onClick={() => setShowStacksTester(!showStacksTester)}
+            className="turnkey-button primary"
+          >
+            {showStacksTester ? "Hide" : "Show"} Stacks Tester
+          </button>
         </div>
+
+        {/* Stacks Transaction Tester */}
+        {showStacksTester && (
+          <div style={{ marginBottom: "2rem" }}>
+            <StacksTransactionTester />
+          </div>
+        )}
+
+        {/* Signing Manager */}
+        {showSigningManager && (
+          <div style={{ marginBottom: "2rem" }}>
+            <SigningManager />
+          </div>
+        )}
+
+        {showExternalWallets && externalProviders.length > 0 && (
+          <div className="wallets-list">
+            <h3>Available External Wallets ({externalProviders.length})</h3>
+            {externalProviders.map((provider, index) => (
+              <div key={index} className="wallet-item">
+                <div className="wallet-info">
+                  <h4>{provider.name || "Unknown Provider"}</h4>
+                  <p className="wallet-id">
+                    Type: {provider.type || "External"}
+                  </p>
+                  {provider.connectedAddresses &&
+                    provider.connectedAddresses.length > 0 && (
+                      <div className="wallet-accounts">
+                        <p className="accounts-label">
+                          Connected: {provider.connectedAddresses.length}{" "}
+                          address(es)
+                        </p>
+                        {provider.connectedAddresses.map((address, idx) => (
+                          <div key={idx} className="account-item">
+                            <span className="account-address">
+                              {address.substring(0, 10)}...
+                              {address.substring(address.length - 8)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                </div>
+                <div className="wallet-actions-inline">
+                  {provider.connectedAddresses &&
+                  provider.connectedAddresses.length > 0 ? (
+                    <button
+                      onClick={() => handleDisconnectExternal(provider)}
+                      className="turnkey-button small"
+                    >
+                      Disconnect
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleConnectExternal(provider)}
+                      className="turnkey-button small primary"
+                    >
+                      Connect
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {wallets.length > 0 && (
           <div className="wallets-list">
-            <h3>Your Wallets ({wallets.length})</h3>
+            <h3>Your Embedded Wallets ({wallets.length})</h3>
             {wallets.map((wallet) => (
               <div key={wallet.walletId} className="wallet-item">
                 <div className="wallet-info">
@@ -103,7 +269,9 @@ export function TurnkeyWalletManager() {
                         <div key={idx} className="account-item">
                           <span className="account-address">
                             {account.address?.substring(0, 10)}...
-                            {account.address?.substring(account.address.length - 8)}
+                            {account.address?.substring(
+                              account.address.length - 8,
+                            )}
                           </span>
                           <span className="account-format">
                             {account.addressFormat}
