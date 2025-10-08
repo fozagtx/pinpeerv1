@@ -10,11 +10,36 @@ export async function GET(req: NextRequest) {
       defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     });
 
-    const wallets = await client.apiClient().getWallets({
+    const walletsResponse = await client.apiClient().getWallets({
       organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     });
 
-    return NextResponse.json(wallets);
+    // Fetch accounts for each wallet
+    const walletsWithAccounts = await Promise.all(
+      walletsResponse.wallets.map(async (wallet) => {
+        try {
+          const accountsResponse = await client.apiClient().getWalletAccounts({
+            organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+            walletId: wallet.walletId,
+          });
+          return {
+            ...wallet,
+            accounts: accountsResponse.accounts,
+          };
+        } catch (error) {
+          console.error(
+            `Failed to fetch accounts for wallet ${wallet.walletId}:`,
+            error,
+          );
+          return {
+            ...wallet,
+            accounts: [],
+          };
+        }
+      }),
+    );
+
+    return NextResponse.json({ wallets: walletsWithAccounts });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: String(e) }, { status: 500 });

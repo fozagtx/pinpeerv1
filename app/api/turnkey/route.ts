@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { Turnkey as TurnkeyServerSDK } from "@turnkey/sdk-server";
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 
 type TBody = {
   message: string;
@@ -16,19 +17,35 @@ export async function POST(req: NextRequest) {
       defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     });
 
-    const stacksPublicKey = process.env.TURNKEY_SIGNER_PUBLIC_KEY!;
+    const walletAccountAddress = process.env.TURNKEY_WALLET_ACCOUNT_ADDRESS!;
+
+    // Ensure payload is 32 bytes (64 hex chars)
+    let payload = body.message.replace(/^0x/, "");
+
+    // If not 32 bytes, hash it with SHA256
+    if (payload.length !== 64) {
+      payload = crypto
+        .createHash("sha256")
+        .update(payload, "hex")
+        .digest("hex");
+    }
 
     const response = await client.apiClient().signRawPayload({
-      signWith: stacksPublicKey,
-      payload: body.message,
+      signWith: walletAccountAddress,
+      payload,
       encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-      hashFunction: "HASH_FUNCTION_SHA256",
+      hashFunction: "HASH_FUNCTION_NO_OP",
     });
 
     return NextResponse.json(response);
   } catch (e) {
-    console.error(e);
-
-    return NextResponse.json({ error: "failed to sign" }, { status: 500 });
+    console.error("Signing error:", e);
+    return NextResponse.json(
+      {
+        error: "failed to sign",
+        details: e instanceof Error ? e.message : String(e),
+      },
+      { status: 500 },
+    );
   }
 }
