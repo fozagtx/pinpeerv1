@@ -91,7 +91,9 @@ const signStacksTx = async () => {
     const nextSig = `${signature!.v}${signature!.r.padStart(64, "0")}${signature!.s.padStart(64, "0")}`;
 
     // Type assertion to access spendingCondition
-    const spendingCondition = stacksTransaction.auth.spendingCondition as any;
+    const spendingCondition = stacksTransaction.auth.spendingCondition as {
+      signature: ReturnType<typeof createMessageSignature>;
+    };
     spendingCondition.signature = createMessageSignature(nextSig);
 
     console.log("\n✅ Transaction signed successfully!");

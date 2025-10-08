@@ -87,7 +87,9 @@ export async function POST(req: NextRequest) {
     });
 
     const nextSig = `${signature.v}${signature.r.padStart(64, "0")}${signature.s.padStart(64, "0")}`;
-    const spendingCondition = transaction.auth.spendingCondition as any;
+    const spendingCondition = transaction.auth.spendingCondition as {
+      signature: ReturnType<typeof createMessageSignature>;
+    };
     spendingCondition.signature = createMessageSignature(nextSig);
 
     console.log("Broadcasting transaction...");
