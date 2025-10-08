@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const publicKey = process.env.TURNKEY_SIGNER_PUBLIC_KEY!;
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     try {
       faucetData = JSON.parse(responseText);
-    } catch (e) {
+    } catch (_e) {
       // If response is not JSON, it might be a success message
       if (responseText.includes("txid") || responseText.includes("success")) {
         return NextResponse.json({

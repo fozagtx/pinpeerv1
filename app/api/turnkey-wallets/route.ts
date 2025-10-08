@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Turnkey as TurnkeyServerSDK } from "@turnkey/sdk-server";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const client = new TurnkeyServerSDK({
       apiBaseUrl: process.env.TURNKEY_BASE_URL!,

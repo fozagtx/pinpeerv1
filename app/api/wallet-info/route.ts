@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const publicKey = process.env.TURNKEY_SIGNER_PUBLIC_KEY!;
 
-    // Derive Stacks address from public key
     const { getAddressFromPublicKey } = await import("@stacks/transactions");
     const { STACKS_TESTNET } = await import("@stacks/network");
     const address = getAddressFromPublicKey(publicKey, STACKS_TESTNET);
 
-    // Get balance from API
     const balanceRes = await fetch(
       `https://api.testnet.hiro.so/extended/v1/address/${address}/balances`,
     );
